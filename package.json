@@ -1,0 +1,20 @@
+{
+  "name"        : "de.htwg.seapal.worker.trip.observer",
+  "version"     : "0.0.0",
+  "private"     : true,
+  "description" : "Worker daemon to observe active trips and generate summarized documents about them.",
+  "main"        : "index.js",
+  "scripts"     : {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "daemon",
+    "seapal"
+  ],
+  "author"      : "seapal",
+  "dependencies": {
+        "nconf"       : ">= 0.6.9",
+        "pouchdb"     : "3.0.3",
+        "de.htwg.seapal.worker"      : "git+http://git@github.com/deparlak/de.htwg.seapal.worker.git"
+    }
+}

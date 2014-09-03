@@ -1,0 +1,13 @@
+{
+    "server" : {     
+        "loginUrl"      :   "http://localhost:9000/login",
+        "logoutUrl"     :   "http://localhost:9000/logout",
+        "syncGatewayUrl":   "http://localhost:9000/database"
+    },
+    
+    "user" : {
+        "email"     :   "trackObserverBot",
+        "password"  :   "TBD_SOME_PASSWORD"
+    }   
+    
+}
