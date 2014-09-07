@@ -120,8 +120,8 @@ var worker = new Worker(server, user, function(err, response) {
         doc.type = 'publishGeohash';
         doc._id = 'publishGeohash/' + geohash;
         doc._rev = null;
-        doc.channels = ['geohash-' + geohash];
         doc.count = value;
+        doc.date = new Date().toISOString();
         
         // if document is already in inWorkQueue, than do no update.
         if (-1 !== inWorkQueue.indexOf(doc._id)) {
