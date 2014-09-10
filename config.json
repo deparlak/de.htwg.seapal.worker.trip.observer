@@ -13,6 +13,19 @@
     "user" : {
         "email"     :   "trackObserverBot1",
         "password"  :   "TBD_A_PASSWORD"
-    }   
+    },
     
+    "views" : [
+        {
+            "design"        :   "geohash",
+            "name"          :   "activeTrips",
+            "opts"          : {
+                "limit"           :   10000,
+                "reduce"          :   false,
+                "stale"           :   "false",
+                "startkey"        :   "e",
+                "endkey"          :   "ez"
+            }
+        }
+    ]
 }
