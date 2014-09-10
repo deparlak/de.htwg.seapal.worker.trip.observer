@@ -20,7 +20,7 @@ var user = nconf.get("user");
 // get couchbase config
 var couchbaseConf = nconf.get("couchbase");
 // get view config
-var view = nconf.get("views")[0];
+var view = nconf.get("view");
 // reference to pouchdb handle
 var pouchdb;
 // reference to couchbase
@@ -32,10 +32,13 @@ var exit = false;
 // timer which calls query cyclic
 var queryTimer;
 // the timeout after which to execute the query again
-var queryTimeout = 10000;
+var queryTimeout = 5000;
 // work queue to add documents which are currently updated
 var inWorkQueue = [];
-
+// range of valid geohash values.
+var validGeohashChar = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+// variable to store the last insert document, to push it again after it is obsolete
+var oldDoc;
 
 // handle the exit event
 process.on('exit', function(code) {
@@ -54,8 +57,7 @@ process.on('SIGINT', function() {
 // start new worker
 var worker = new Worker(server, user, function(err, response) {
     if (err) {
-        // querry failed
-        throw err;
+        throw new Error(err);
     }
     
     console.log("Observer is running");
@@ -65,7 +67,7 @@ var worker = new Worker(server, user, function(err, response) {
     bucket = new couchbase.Connection(couchbaseConf, function(err) {
         if (err) {
             // Failed to make a connection to the Couchbase cluster.
-            throw err;
+            throw new Error(err);
         }
         // set the view which we like to get
         viewQuery = bucket.view(view.design, view.name);
@@ -81,14 +83,14 @@ var worker = new Worker(server, user, function(err, response) {
         // execute query now
         viewQuery.query(view.opts, function(err, results) {
             if (err) {
-                console.error(err);
                 // querry failed
-                throw err;
+                throw new Error(err);
             }
             if (results.length > 0) {
                 var doc = prepareResults(results);
                 updateStatistic(doc);
             }
+            console.log("Querry result with "+results.length+ " documents.");
             // set the query parameter for the next run
             setQueryParameter();
             // init the timeout to call the queryLoop later.
@@ -101,29 +103,29 @@ var worker = new Worker(server, user, function(err, response) {
         // get the time now.
         var now = new Date();
         // set the actual time as the start key.
-        view.opts.startkey = [now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), view.opts.startkey];
-        // set the actual time as the start key.
-        view.opts.endkey = [now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), view.opts.endkey];
+        view.opts.startkey = [[now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes()]];
+        // set the end key 1 minute later. Note that at the borders (from minute to minute, minute to hour, hour to hour, etc it is possible that not all data is available).
+        view.opts.endkey = [[now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes() + 1]];
     }; 
     
     // prepare the result, which mean that we use run through the documents and do some summation
     var prepareResults = function (queryResult) {
         var doc = {};
+        var now = new Date().toISOString();
+        doc.date = now;
         doc.owner = user.email;
-        doc.startkey = view.opts.startkey;
-        doc.endkey = view.opts.endkey;
         doc.type = 'publishGeohash';
-        doc._id = 'publishGeohash/' + view.opts.startkey;
+        doc._id = user.email + '/publishGeohash/' + now;
         doc.sum = queryResult.length;
         doc._rev = null;
         doc.boats = {};
-        var now = new Date().toISOString();
-        doc.date = now;
+        // add the channels values, to which we should map this document.
+        doc.channels = view.channels;
 
         // run through all results
         for(var i = 0; i < queryResult.length; i++) {
-            geohash = queryResult[i].key[queryResult[i].key.length - 1];
-            boat = queryResult[i].value;
+            var geohash = queryResult[i].value.geohash;
+            var boat = queryResult[i].key[queryResult[i].key.length - 1];
             doc.boats[boat] = geohash;
         }
         return doc;
@@ -139,40 +141,40 @@ var worker = new Worker(server, user, function(err, response) {
         // add document in inWorkQueue, to avoid multiple doc creations.
         inWorkQueue.push(doc._id);
         
-        console.log(new Date().toISOString() + " : Documents in work queue : " + inWorkQueue.length);
         console.log("Proccess : " + view.opts.startkey + " - " + view.opts.endkey);
         
-        // get the document and update it
-        pouchdb.get(doc._id, function (err, response) {
-            // check if the document could not be get. If we have a 404, no initial document existed yet
-            if (err && err.status != 404) {
+        // update it now.
+        pouchdb.put(doc, function(err, response) {
+            if (err) {
                 throw new Error(err);
             }
 
-            // check if there was a _rev returned
-            if (response && response._rev) {
-                doc._rev = response._rev;
+            if (oldDoc) {
+                pouchdb.put(oldDoc, function(err, response) {
+                    if (err) {
+                        console.log("Error while updating obsolete document : "+err);
+                    } else {
+                        console.log("oldDoc is now obsolete!");
+                    }
+                });
             }
             
-            // update it now.
-            pouchdb.put(doc, function(err, response) {
-                if (err) {
-                    throw new Error(err);
-                }
-                
-                // check if document is in in work queue and remove it
-                var index = inWorkQueue.indexOf(doc._id);
-                if (-1 !== index) {
-                    inWorkQueue.splice(index, 1);
-                }
-                
-                console.log(new Date().toISOString() + " : Documents in work queue : " + inWorkQueue.length);
-                
-                // check if there was a _rev returned
-                if (!response || !response.rev) {
-                    throw new Error("Got no rev after put");
-                }
-            });
+            // ok document successfully stored, store a reference to the document to update it after it is obsolete
+            // it is obsolete when we push another document.
+            oldDoc = doc;
+            oldDoc.obsolete = true;
+            oldDoc._rev = response.rev;
+            
+            // check if document is in in work queue and remove it
+            var index = inWorkQueue.indexOf(doc._id);
+            if (-1 !== index) {
+                inWorkQueue.splice(index, 1);
+            }
+            
+            // check if there was a _rev returned
+            if (!response || !response.rev) {
+                throw new Error("Got no rev after put");
+            }
         });
         
     };
