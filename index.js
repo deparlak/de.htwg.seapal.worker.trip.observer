@@ -32,13 +32,17 @@ var exit = false;
 // timer which calls query cyclic
 var queryTimer;
 // the timeout after which to execute the query again
-var queryTimeout = 5000;
+var queryTimeout = 10000;
 // work queue to add documents which are currently updated
 var inWorkQueue = [];
 // range of valid geohash values.
 var validGeohashChar = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
 // variable to store the last insert document, to push it again after it is obsolete
 var oldDoc;
+// max repeations after a timeout
+var maxTimeoutErrorRetries = 4;
+// counter for error, because of timeout
+var timeoutErrorCounter = 0;
 
 // handle the exit event
 process.on('exit', function(code) {
@@ -146,7 +150,21 @@ var worker = new Worker(server, user, function(err, response) {
         // update it now.
         pouchdb.put(doc, function(err, response) {
             if (err) {
+                timeoutErrorCounter++;
+                // repeat after a timeout, if not max repeats are reached.
+                if (maxTimeoutErrorRetries > timeoutErrorCounter) {
+                    console.log(err);
+                    console.log("Retry after " + timeoutErrorCounter + " calls. "+err);
+                    timer = setTimeout(sumulatePosition, timeout);
+                    return;
+                }
+                // max retries reached.
                 throw new Error(err);
+            }
+            if (0 !== timeoutErrorCounter) {
+                console.log("Process is running ok again after " + timeoutErrorCounter + " retries. ");
+                // no error occurred, so set counter back
+                timeoutErrorCounter = 0;
             }
 
             if (oldDoc) {
