@@ -31,8 +31,6 @@ var viewQuery;
 var exit = false;
 // timer which calls query cyclic
 var queryTimer;
-// the timeout after which to execute the query again
-var queryTimeout = 10000;
 // work queue to add documents which are currently updated
 var inWorkQueue = [];
 // range of valid geohash values.
@@ -98,7 +96,7 @@ var worker = new Worker(server, user, function(err, response) {
             // set the query parameter for the next run
             setQueryParameter();
             // init the timeout to call the queryLoop later.
-            queryTimer = setTimeout(queryLoop, queryTimeout); 
+            queryTimer = setTimeout(queryLoop, view.settings.queryTimeout); 
         });
     }
     
