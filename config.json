@@ -6,8 +6,10 @@
     },
     
     "couchbase" : {
-        "bucket"        :   "sync_gateway",
-        "host"          :   ["http://192.168.35.128:8091/"]
+        "bucket"            :   "sync_gateway",
+        "host"              :   ["http://192.168.35.128:8091/"],
+        "operationTimeout"  :   2500,
+        "connectionTimeout" :   5000
     },
     
     "user" : {

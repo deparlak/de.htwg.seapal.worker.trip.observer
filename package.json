@@ -15,6 +15,7 @@
   "dependencies": {
         "nconf"       : ">= 0.6.9",
         "pouchdb"     : "3.0.3",
+        "couchbase"   : "1.2.4",
         "de.htwg.seapal.worker"      : "git+http://git@github.com/deparlak/de.htwg.seapal.worker.git"
     }
 }
