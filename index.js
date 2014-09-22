@@ -142,8 +142,6 @@ var worker = new Worker(server, user, function(err, response) {
             for (var j = 5; j < 14; j++) {
                 geohash += queryResult[i].key[j];
             }
-            console.log(geohash);
-            console.log(boat);
             publishGeohash.boats[boat] = geohash;
         }
     }
