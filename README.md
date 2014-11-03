@@ -9,14 +9,14 @@ This project is a node.js application, which aggregate boat positions of seapal 
 one document. This enable us to share the information about the position of each user
 with each user. A Client does not need direct access to the view mechanism of couchbase. 
 
-* Why do we not just use a view and ask the view directly by each user?
-The Sync Gateway does (currently) not support views. So we would need another Route on a Webserver to access the
+####Why do we not just use a view and ask the view directly by each user?
+>The Sync Gateway does (currently) not support views. So we would need another Route on a Webserver to access the
 Couchbase View directly. If we use another Route, we would also need a mechanism to avoid polling the view. The Sync Gateway
 does use a Comet connection to each user, to notify a user about new/updated/removed documents. So the idea is to use
 the available infrastructure, instead of creating another API.
 
-* Why do we not use one channel, to which each user map his position document?
-The amount of documents which would be loaded to/from the Sync Gateway would be quadratic. E.g. we have 10 users. Each
+##Why do we not use one channel, to which each user map his position document?
+>The amount of documents which would be loaded to/from the Sync Gateway would be quadratic. E.g. we have 10 users. Each
 user will send his position to the Sync Gateway. Afterwards each user has to download the position of the other users,
 which would be 90 Documents (each user has to download 9 Documents). This approach would simply not scale on a rising
 number of users.
