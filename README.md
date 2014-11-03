@@ -78,9 +78,10 @@ Configuration.
 
 If we do not use a view to summarize the data, the **noView** Attribute will be used.
 * channels            : The geohash channels to which the bot server listen, to summarize from these channels.
-* timeout             : The frequency for creating a summary document.
+* timeout             : The frequency for creating a summary document in seconds.
+* validTime           : The time in seconds, how long a position document of a user is valid.
 
-If we use a view, we need the "**view** Attribute.
+If we use a view, we need the **view** Attribute.
 
 **Make sure that the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt) was created on in couchbase server.**
 * design              : The design document, under which our view is stored on the couchbase server
@@ -90,7 +91,7 @@ If we use a view, we need the "**view** Attribute.
 * channelEnd          : Set the start range of the query range. Startkey will be set to actualTime + 1 + channelEnd (=geohash to end) 
 * channels            : The channels we like to map the document which will be created by the bot server. This should be the same channel
                       range as with channelStart and channelEnd.
-* queryTimeout        : The timeout after which to call the query again.   
+* queryTimeout        : The timeout after which to call the query again in seconds.
         
 ``` 
 {
@@ -130,7 +131,7 @@ If we use a view, we need the "**view** Attribute.
             "channelStart"  :  ["0"],
             "channelEnd"    :  ["Z"],
             "channels"      :  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "b", "c", "d", "e", "f", "g", "h", "j", "k", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-            "queryTimeout"  :   2000
+            "queryTimeout"  :   5
         }
     }
 }
