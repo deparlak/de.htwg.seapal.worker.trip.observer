@@ -81,7 +81,8 @@ If we do not use a view to summarize the data, the **noView** Attribute will be 
 * timeout             : The frequency for creating a summary document.
 
 If we use a view, we need the "**view** Attribute.
-**Make sure that the view was created on in couchbase server. The view can be found under view.txt in this project folder**
+
+**Make sure that the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt) was created on in couchbase server.**
 * design              : The design document, under which our view is stored on the couchbase server
 * name                : The name of the view on the couchbase server.
 * opts                : Some view specific parameters, to set max documents, set reduce to false and stale.
@@ -145,7 +146,6 @@ npm install
 node noViewInit
 # This command will start an observer which uses no view
 node noView
-# This command will start an observer using a view (note that you need couchbase for this). Be also
-# sure that you created the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt)
+# This command will start an observer using a view (note that you need couchbase for this).
 node view
 ```
