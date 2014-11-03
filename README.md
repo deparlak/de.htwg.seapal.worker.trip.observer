@@ -110,7 +110,7 @@ If we use a view, we need the **view** Attribute.
     
     "user" : {
         "email"             :   "trackObserverBot1",
-        "password"          :   "TBD_A_PASSWORD",
+        "password"          :   "TBD_A_PASSWORD"
     },
     
     "noView" : {
