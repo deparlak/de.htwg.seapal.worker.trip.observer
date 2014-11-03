@@ -109,7 +109,7 @@ var worker = new Worker(server, user, function(err, response) {
             // set the query parameter for the next run
             setQueryParameter();
             // init the timeout to call the queryLoop later.
-            queryTimer = setTimeout(queryLoop, view.settings.queryTimeout) * 1000; 
+            queryTimer = setTimeout(queryLoop, view.settings.queryTimeout * 1000); 
         });
     }
     
@@ -120,7 +120,7 @@ var worker = new Worker(server, user, function(err, response) {
         // set the actual time as the start key.
         view.opts.startkey = [now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes()].concat(view.settings.channelStart);
         // set the end key 1 minute later. Note that at the borders (from minute to minute, minute to hour, hour to hour, etc it is possible that not all data is available).
-        view.opts.endkey = [now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes() + 1].concat(view.settings.channelEnd);
+        view.opts.endkey = [now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes()].concat(view.settings.channelEnd);
     }; 
     
     // prepare the result, which mean that we use run through the documents and do some summation
@@ -157,7 +157,7 @@ var worker = new Worker(server, user, function(err, response) {
                 if (maxTimeoutErrorRetries > timeoutErrorCounter) {
                     console.log(err);
                     console.log("Retry after " + timeoutErrorCounter + " calls. "+err);
-                    timer = setTimeout(updateStatistic, view.settings.queryTimeout);
+                    timer = setTimeout(updateStatistic, view.settings.queryTimeout * 1000);
                     return;
                 }
                 // max retries reached.

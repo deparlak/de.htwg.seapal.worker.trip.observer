@@ -88,7 +88,7 @@ If we use a view, we need the **view** Attribute.
 * name                : The name of the view on the couchbase server.
 * opts                : Some view specific parameters, to set max documents, set reduce to false and stale.
 * channelStart        : Set the start range of the query range. Startkey will be set to actualTime + channelStart (=geohash to start)
-* channelEnd          : Set the start range of the query range. Startkey will be set to actualTime + 1 + channelEnd (=geohash to end) 
+* channelEnd          : Set the start range of the query range. Startkey will be set to actualTime + channelEnd (=geohash to end) 
 * channels            : The channels we like to map the document which will be created by the bot server. This should be the same channel
                       range as with channelStart and channelEnd.
 * queryTimeout        : The timeout after which to call the query again in seconds.
@@ -131,7 +131,7 @@ If we use a view, we need the **view** Attribute.
             "channelStart"  :  ["0"],
             "channelEnd"    :  ["Z"],
             "channels"      :  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "b", "c", "d", "e", "f", "g", "h", "j", "k", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-            "queryTimeout"  :   5
+            "queryTimeout"  :   3
         }
     }
 }
