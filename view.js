@@ -62,7 +62,7 @@ var worker = new Worker(server, user, function(err, response) {
         throw new Error(err);
     }
     
-    console.log("Observer is running");
+    console.log("Observer is running (press ctrl+c to end)");
     // save pouchdb handle
     pouchdb = response;
    
@@ -109,7 +109,7 @@ var worker = new Worker(server, user, function(err, response) {
             // set the query parameter for the next run
             setQueryParameter();
             // init the timeout to call the queryLoop later.
-            queryTimer = setTimeout(queryLoop, view.settings.queryTimeout); 
+            queryTimer = setTimeout(queryLoop, view.settings.queryTimeout) * 1000; 
         });
     }
     

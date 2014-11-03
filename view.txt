@@ -1,0 +1,22 @@
+function (doc, meta) {
+  var sync = doc._sync;
+  if (sync === undefined || meta.id.substring(0,6) == "_sync:")
+    return;
+  if ((sync.flags & 1) || sync.deleted)
+    return;
+  
+  if ('geoPosition' !== doc.type) return;
+  if (!doc.owner || !doc.date) return;
+  if (!doc.geohash || doc.geohash.length !== 9) return;
+    
+  //get date (year, mounth, day, hour, minute)
+  var date = dateToArray(doc.date);
+  var key = [date[0], date[1], date[2], date[3], date[4], 
+             doc.geohash[0], doc.geohash[1], doc.geohash[2], 
+             doc.geohash[3], doc.geohash[4], doc.geohash[5], 
+             doc.geohash[6], doc.geohash[7], doc.geohash[8],
+             doc.owner]; 
+  
+
+  emit(key, null); 
+}

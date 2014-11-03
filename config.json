@@ -7,14 +7,20 @@
     
     "couchbase" : {
         "bucket"            :   "sync_gateway",
-        "host"              :   ["http://192.168.35.128:8091/"],
+        "host"              :   ["http://localhost:8091/"],
         "operationTimeout"  :   2500,
         "connectionTimeout" :   5000
     },
     
     "user" : {
-        "email"     :   "trackObserverBot1",
-        "password"  :   "TBD_A_PASSWORD"
+        "email"             :   "trackObserverBot1",
+        "password"          :   "TBD_A_PASSWORD"
+    },
+    
+    "noView" : {
+        "channels"          :   ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "b", "c", "d", "e", "f", "g", "h", "j", "k", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
+        "timeout"           :   3,
+        "validTime"         :   60
     },
     
     "view" : {
@@ -27,9 +33,9 @@
         },
         "settings"      : {
             "channelStart"  :  ["0"],
-            "channelEnd"    :  ["z"],
+            "channelEnd"    :  ["Z"],
             "channels"      :  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "b", "c", "d", "e", "f", "g", "h", "j", "k", "m", "n", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
-            "queryTimeout"  :   2000
+            "queryTimeout"  :   5
         }
     }
 }
