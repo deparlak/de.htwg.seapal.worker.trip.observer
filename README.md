@@ -26,7 +26,7 @@ number of users.
 the Sync Gateway does not support views, the bot server need to access the Couchbase Server Backend directly.
 The second approach does not use a view and needs no access to the Couchbase Server Backend.
 
-####How does the approach work with the use of a view.
+####How does the approach work with the use of a view?
 >Each user create a document with his position. The position is saved as a [geohash](http://www.bigdatamodeling.org/2013/01/intuitive-geohash.html). On the Couchbase Server
 we use a view, which emit the position document with the date of creation and the geohash as the key. 
 Because of the use of the geohash in the key, we are able to query the view for different locations.
@@ -145,6 +145,7 @@ npm install
 node noViewInit
 # This command will start an observer which uses no view
 node noView
-# This command will start an observer using a view (note that you need couchbase for this)
+# This command will start an observer using a view (note that you need couchbase for this). Be also
+# sure that you created the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt)
 node view
 ```
