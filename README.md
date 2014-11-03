@@ -15,19 +15,19 @@ Couchbase View directly. If we use another Route, we would also need a mechanism
 does use a Comet connection to each user, to notify a user about new/updated/removed documents. So the idea is to use
 the available infrastructure, instead of creating another API.
 
-##Why do we not use one channel, to which each user map his position document?
+####Why do we not use one channel, to which each user map his position document?
 >The amount of documents which would be loaded to/from the Sync Gateway would be quadratic. E.g. we have 10 users. Each
 user will send his position to the Sync Gateway. Afterwards each user has to download the position of the other users,
 which would be 90 Documents (each user has to download 9 Documents). This approach would simply not scale on a rising
 number of users.
 
-* How does a bot server receive the documents (with the position of a user), which he need to aggregate to one document?
-There are two approaches implemented. The first one is using a view to get the information about the user positions. Because
+####How does a bot server receive the documents (with the position of a user), which he need to aggregate to one document?
+>There are two approaches implemented. The first one is using a view to get the information about the user positions. Because
 the Sync Gateway does not support views, the bot server need to access the Couchbase Server Backend directly.
 The second approach does not use a view and needs no access to the Couchbase Server Backend.
 
-* How does the approach work with the use of a view.
-Each user create a document with his position. The position is saved as a [geohash](http://www.bigdatamodeling.org/2013/01/intuitive-geohash.html). On the Couchbase Server
+####How does the approach work with the use of a view.
+>Each user create a document with his position. The position is saved as a [geohash](http://www.bigdatamodeling.org/2013/01/intuitive-geohash.html). On the Couchbase Server
 we use a view, which emit the position document with the date of creation and the geohash as the key. 
 Because of the use of the geohash in the key, we are able to query the view for different locations.
 The bot server query the view cyclic and create a new document with all users of the queried geohash
@@ -36,14 +36,13 @@ for different locations. If we have for example not many users, we could use onl
 the view to get all geohash locations. If the number of users are rising, we may require additional Bot Server which
 query the views for different locations.
 
-* How does the approach work without using a view?
-If a user create a document with his position, we map the geohash position to some channels in the Sync Function.
+####How does the approach work without using a view?
+>If a user create a document with his position, we map the geohash position to some channels in the Sync Function.
 E.g. if the user position is on geohash "01234567bc", we map this document to up to 9 channels.
 processGeohash-0
 processGeohash-01 
 processGeohash-012
 .....
-
 These channels are not accessible by a normal seapal user, so that the documents will not be send to other users.
 A Bot Server is now able to subscribe to any of these channels. If he subscribe to a channel, he will be notified
 from the Sync Gateway, if a new document will be added with the position of a user. The Bot Server then need
@@ -51,8 +50,8 @@ to create a document with all active users after a defined timeout. The document
 Server is accessible by every Seapal User, so that they get notified about other active users.
 A Bot Server, which handle all geohash locations, simply subscribe to 32 Geohashs from processGeohash-0 to processGeohash-z.
 
-* Can a Client control the locations from which he like to get summary documents?
-Yes, a Bot Server create a document with all users from a specified location. These documents are from the type "publishGeohash", and 
+####Can a Client control the locations from which he like to get summary documents?
+>Yes, a Bot Server create a document with all users from a specified location. These documents are from the type "publishGeohash", and 
 are mapped to the geohash locations which are observed by this Bot Server. A Client can subscribe to these locations by creating
 a "subscribeGeohash" document. This document contain the geohash locations from which the client like to get updates. To get all
 updates a client simply subscribe from geohash-0 to geohash-z.
