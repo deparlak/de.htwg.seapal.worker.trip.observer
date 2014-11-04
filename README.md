@@ -56,8 +56,23 @@ are mapped to the geohash locations which are observed by this Bot Server. A Cli
 a "subscribeGeohash" document. This document contain the geohash locations from which the client like to get updates. To get all
 updates a client simply subscribe from geohash-0 to geohash-z.
 
+####Where can we find the above mentioned documents in the [Sync Gateway Configuration](https://github.com/deparlak/de.htwg.seapal.play/blob/app/Sync%20Gateway/config.json)?
+Let's say something about the important document types (doc.type) in the configuration file.
+* geoPosition : Is the position of each user, which he creates cyclic (Important is that he save the position as a geohash). The document will be mapped to processGeohash-x channels, where
+x is the geohash with different resolutions.
+* processGeohash : A Bot server can create a document of this type. So that he subscribe to processGeohash-x channels, to get notified if a document of some of these channels get created.
+* subscribeGeohash : This document can be created by a normal Seapal User. The user subscribe to geohash-x channels, to get notified if documents which are mapped to these channels are created. The
+user can control with this document, from which geohash locations he get updates.
+* publishGeohash : This document can be created by a Bot Server. The document contain all user of a geohash location, as a list. The document gets mapped to the geohash-x channels, where the users are in.
+An example could be that the document is mapped to the channels *geohash-0*, *geohash-1* and the active users which are stored in the document could be
+Username            Geohash
+test@seapal.de      01111123
+other@user.com      03111111
+another@seapal.de   10000000
+
+
 #Configuration
-The complete configuration is stored in the **config.json** file.
+The complete configuration is stored in the [config.json](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/config.json) file.
 
 The **server** Attribute contain all information about the running server.
 * loginUrl        : The URL, to which the bots can sent the login data. This is the URL of the play server.
@@ -83,7 +98,7 @@ If we do not use a view to summarize the data, the **noView** Attribute will be 
 
 If we use a view, we need the **view** Attribute.
 
-**Make sure that the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt) was created on in couchbase server.**
+**Make sure that the [view](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/view.txt) was created on your Couchbase Server.**
 * design              : The design document, under which our view is stored on the couchbase server
 * name                : The name of the view on the couchbase server.
 * opts                : Some view specific parameters, to set max documents, set reduce to false and stale.
