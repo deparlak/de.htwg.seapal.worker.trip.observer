@@ -60,16 +60,63 @@ updates a client simply subscribe from geohash-0 to geohash-z.
 Let's say something about the important document types (doc.type) in the configuration file.
 * geoPosition : Is the position of each user, which he creates cyclic (Important is that he save the position as a geohash). The document will be mapped to processGeohash-x channels, where
 x is the geohash with different resolutions.
-* processGeohash : A Bot server can create a document of this type. So that he subscribe to processGeohash-x channels, to get notified if a document of some of these channels get created.
-* subscribeGeohash : This document can be created by a normal Seapal User. The user subscribe to geohash-x channels, to get notified if documents which are mapped to these channels are created. The
-user can control with this document, from which geohash locations he get updates.
-* publishGeohash : This document can be created by a Bot Server. The document contain all user of a geohash location, as a list. The document gets mapped to the geohash-x channels, where the users are in.
-An example could be that the document is mapped to the channels *geohash-0*, *geohash-1* and the active users which are stored in the document could be
-Username            Geohash
-test@seapal.de      01111123
-other@user.com      03111111
-another@seapal.de   10000000
+``` 
+{
+    "type"    : "geoPosition",
+    "owner"   : "trackSimulationBot9", 
+    "_id"     : "trackSimulationBot9/geoPosition",
+    "_rev"    : null, 
+    "lat"     : 0,
+    "lng"     : -11.25,
+    "geohash" : "ebzzzzzzz",
+    "date"    : "2014-11-04T13:05:40.988Z"
+}
+```
 
+* processGeohash : A Bot server can create a document of this type. So that he subscribe to processGeohash-x channels, to get notified if a document of some of these channels get created.
+Note that each element of the *channels* Attribute will be concatenated with "processGeohash-" in the Sync Function.
+```
+{
+    "type"    : "processGeohash",
+    "owner"   : "trackObserverBot1",
+    "_id"     : "trackObserverBot1/processGeohash",
+    "_rev"    : null,
+    "channels":["0","1","2","3","4","5","6","7","8","9","b","c","d","e","f","g","h","j","k","m","n","p","q","r","s","t","u","v","w","x","y","z"]
+}
+```
+
+* subscribeGeohash : This document can be created by a normal Seapal User. The user subscribe to geohash-x channels, to get notified if documents which are mapped to these channels are created. The
+user can control with this document, from which geohash locations he get updates. In our example the user only subscribe to "0" and "1", which mean that he would only receive geohashs starting
+with "geohash-0........" or "geohash-e........".
+```
+{
+    "type"     : "subscribeGeohash",
+    "owner"    : "test@test.de",
+    "_id"      : "test@test.de/subscribeGeohash/2014-11-04T13:11:41.956Z",
+    "_rev"     : null,
+    "channels" :["0", "e"]
+}
+```
+
+* publishGeohash : This document can be created by a Bot Server and is mapped to geohash-x channels. So if the Bot Server is observing processGeohash-0, he will map this document
+to the geohash-0 channel. In our example below, we see that the Observer is observing all geohash channels with the lowest resolution (0 - z). He saved 3 Users and their position
+in the *boats* Attribute. Our user above would receive this document, because he subscribed to geohash-0 and geohash-e.
+```
+{
+    "owner"     :  "trackObserverBot1",
+    "type"      : "publishGeohash",
+    "_id"       : "trackObserverBot1/publishGeohash",
+    "_rev"      : null,
+    "date"      :"2014-11-04T13:16:18.455Z",
+    "channels"  :["0","1","2","3","4","5","6","7","8","9","b","c","d","e","f","g","h","j","k","m","n","p","q","r","s","t","u","v","w","x","y","z"],
+    "boats"     :
+    {
+        "trackSimulationBot3" : "efpcxgpyr",
+        "trackSimulationBot4" : "e4pcxgpyr",
+        "trackSimulationBot9" : "epzzzzzzz"}
+    }
+}
+```
 
 #Configuration
 The complete configuration is stored in the [config.json](https://github.com/deparlak/de.htwg.seapal.worker.trip.observer/blob/master/config.json) file.
