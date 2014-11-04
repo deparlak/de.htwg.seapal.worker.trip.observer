@@ -56,7 +56,7 @@ are mapped to the geohash locations which are observed by this Bot Server. A Cli
 a "subscribeGeohash" document. This document contain the geohash locations from which the client like to get updates. To get all
 updates a client simply subscribe from geohash-0 to geohash-z.
 
-####Where can we find the above mentioned documents in the [Sync Gateway Configuration](https://github.com/deparlak/de.htwg.seapal.play/blob/app/Sync%20Gateway/config.json)?
+####What are the document types in the [Sync Gateway Configuration](https://github.com/deparlak/de.htwg.seapal.play/blob/app/Sync%20Gateway/config.json)?
 Let's say something about the important document types (doc.type) in the configuration file.
 * geoPosition : Is the position of each user, which he creates cyclic (Important is that he save the position as a geohash). The document will be mapped to processGeohash-x channels, where
 x is the geohash with different resolutions.
